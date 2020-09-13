@@ -104,7 +104,7 @@ class BookIntegrationTest {
 	/**
 	 * TODO: Activity 2 (Week 6)
 	 * Add integration tests for delete/update a book.
-	 * For delete operation: there should be two tests for success and failure scenarios.
+	 * For delete operation: there should be two tests for success and failure (book not found) scenarios.
 	 * Similarly, there should be two tests for update operation.
 	 * You should assert both the HTTP response code, and the value returned if any
 	 * 

@@ -70,15 +70,4 @@ public class BookServiceTest {
         verify(books).findById(bookId);
     }
 
-    /**
-     * TODO: Activity 1 (Week 6)
-     * Add a few unit tests to detect the errors in the BookServiceImpl class
-     * Method to be tested: "countLongestBookTitles"
-     * 
-     * Consider a few cases to test using input partitioning approach
-     * Then fix the issues in BookServiceImpl to pass all the tests
-     * 
-     * Add your test cases below.
-     */
-    // your code here
 }

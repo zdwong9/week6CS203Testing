@@ -26,7 +26,7 @@ public class BookServiceImpl implements BookService {
     }
     
     /**
-     * Add logic to avoid adding books with the same title
+     * Added logic to avoid adding books with the same title
      * Return null if there exists a book with the same title
      */
     @Override
@@ -54,27 +54,6 @@ public class BookServiceImpl implements BookService {
     @Override
     public void deleteBook(Long id){
         books.deleteById(id);
-    }
-
-    /**
-     * Count the number of books having the longest title
-     * Return: int
-     * Note: the current implementation is not correct.
-     * 
-     * TODO: Activity 1 (Week 6)
-     * After running your unit tests, please correct the code here to pass all the tests
-     */
-    public int countLongestBookTitles(){
-        List<Book> allBooks = books.findAll();
-        int longestTitle = 0;
-        for(Book book: allBooks){
-            if(book.getTitle().length() > longestTitle)
-                longestTitle = book.getTitle().length(); 
-        }
-        
-        // your code here
-        
-        return longestTitle;
     }
 
 }
