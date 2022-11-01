@@ -55,7 +55,20 @@ public class BookServiceTest {
     @Test
     void addBook_SameTitle_ReturnNull(){
         // your code here
-                
+
+        // arrange ***
+        Book book = new Book("This is a Same Title");
+        List<Book> sameTitles = new ArrayList<>();
+        sameTitles.add(new Book("This is a Same Title"));
+        // mock the "findbytitle" operation
+        when(books.findByTitle(any(String.class))).thenReturn(sameTitles);
+
+        Book savedBook = bookService.addBook(book);
+
+        assertNull(savedBook);
+
+        verify(books).findByTitle(book.getTitle());
+
     }
 
     @Test

@@ -15,6 +15,8 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.RequestEntity;
+import org.springframework.http.MediaType;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import csd.week6.user.User;
@@ -113,5 +115,80 @@ class BookIntegrationTest {
 										.exchange(uri, HttpMethod.DELETE, null, Void.class);
 	 */
 	// your code here
-	
+	public void deleteBook_ValidBookId_Success() throws Exception{
+		Book book = new Book("A New Hope");
+		URI uri = new URI(baseUrl + port + "/books/" +book.getId());
+		books.save(book);
+
+		users.save(new User("admin", encoder.encode("goodpassword"), "ROLE_ADMIN"));
+
+		ResponseEntity<Void> result = restTemplate.withBasicAuth("admin", "goodpassword")
+										.exchange(uri, HttpMethod.DELETE, null, Void.class);
+
+		assertEquals(200,result.getStatusCode().value());
+
+		result = restTemplate.withBasicAuth("admin", "goodpassword").exchange(uri, HttpMethod.DELETE, null, Void.class);
+
+		assertEquals(404,result.getStatusCode().value());
+	}
+	public void deleteBook_inValidBookId_Failure() throws Exception{
+		Book book = new Book("A New Hope");
+		URI uri = new URI(baseUrl + port + "/books/" +book.getId());
+
+		users.save(new User("admin", encoder.encode("goodpassword"), "ROLE_ADMIN"));
+
+		ResponseEntity<Void> result = restTemplate.withBasicAuth("admin", "goodpassword")
+										.exchange(uri, HttpMethod.DELETE, null, Void.class);
+
+		assertEquals(404,result.getStatusCode().value());
+	}
+
+	public void updateBook_ValidBookId_Success() throws Exception{
+		
+		//arrange book
+		Book book = new Book("A New Hope");
+		//arrange updated book
+		Book newBook = new Book("A Updated Hope");
+
+		//arrange uri
+		URI uri = new URI(baseUrl + port + "/books/" +book.getId());
+		
+		//mock the save
+		books.save(book);
+		
+		// arrange and mock save
+		users.save(new User("admin", encoder.encode("goodpassword"), "ROLE_ADMIN"));
+		
+		RequestEntity<Book> request = RequestEntity
+		.post(uri)
+		.accept(MediaType.APPLICATION_JSON)
+		.body(newBook);
+
+		ResponseEntity<Book> result = restTemplate.withBasicAuth("admin", "goodpassword")
+										.exchange(request, Book.class);
+
+		assertEquals(200,result.getStatusCode().value());
+		assertEquals(newBook.getTitle(),result.getBody().getTitle());
+	}
+	public void updateBook_inValidBookId_Failure() throws Exception{
+		
+		//arrange book
+		Book book = new Book("A New Hope");
+
+		//arrange uri
+		URI uri = new URI(baseUrl + port + "/books/" +book.getId());
+				
+		// arrange and mock save
+		users.save(new User("admin", encoder.encode("goodpassword"), "ROLE_ADMIN"));
+		
+		RequestEntity<Book> request = RequestEntity
+		.post(uri)
+		.accept(MediaType.APPLICATION_JSON)
+		.body(book);
+
+		ResponseEntity<Book> result = restTemplate.withBasicAuth("admin", "goodpassword")
+										.exchange(request, Book.class);
+
+		assertEquals(404,result.getStatusCode().value());
+	}
 }
