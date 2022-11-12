@@ -196,5 +196,7 @@ class BookIntegrationTest {
 				.exchange(request, Book.class);
 
 		assertEquals(404, result.getStatusCode().value());
+
+		System.out.println("hello hello");
 	}
 }
