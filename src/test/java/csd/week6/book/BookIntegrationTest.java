@@ -22,7 +22,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import csd.week6.user.User;
 import csd.week6.user.UserRepository;
 
-/** Start an actual HTTP server listening at a random port*/
+/** Start an actual HTTP server listening at a random port */
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 class BookIntegrationTest {
 
@@ -33,9 +33,11 @@ class BookIntegrationTest {
 
 	@Autowired
 	/**
-	 * Use TestRestTemplate for testing a real instance of your application as an external actor.
-	 * TestRestTemplate is just a convenient subclass of RestTemplate that is suitable for integration tests.
- 	 * It is fault tolerant, and optionally can carry Basic authentication headers.
+	 * Use TestRestTemplate for testing a real instance of your application as an
+	 * external actor.
+	 * TestRestTemplate is just a convenient subclass of RestTemplate that is
+	 * suitable for integration tests.
+	 * It is fault tolerant, and optionally can carry Basic authentication headers.
 	 */
 	private TestRestTemplate restTemplate;
 
@@ -48,9 +50,8 @@ class BookIntegrationTest {
 	@Autowired
 	private BCryptPasswordEncoder encoder;
 
-
 	@AfterEach
-	void tearDown(){
+	void tearDown() {
 		// clear the database after each test
 		books.deleteAll();
 		users.deleteAll();
@@ -60,11 +61,11 @@ class BookIntegrationTest {
 	public void getBooks_Success() throws Exception {
 		URI uri = new URI(baseUrl + port + "/books");
 		books.save(new Book("Gone With The Wind"));
-		
+
 		// Need to use array with a ReponseEntity here
 		ResponseEntity<Book[]> result = restTemplate.getForEntity(uri, Book[].class);
 		Book[] books = result.getBody();
-		
+
 		assertEquals(200, result.getStatusCode().value());
 		assertEquals(1, books.length);
 	}
@@ -74,9 +75,9 @@ class BookIntegrationTest {
 		Book book = new Book("Gone With The Wind");
 		Long id = books.save(book).getId();
 		URI uri = new URI(baseUrl + port + "/books/" + id);
-		
+
 		ResponseEntity<Book> result = restTemplate.getForEntity(uri, Book.class);
-			
+
 		assertEquals(200, result.getStatusCode().value());
 		assertEquals(book.getTitle(), result.getBody().getTitle());
 	}
@@ -84,9 +85,9 @@ class BookIntegrationTest {
 	@Test
 	public void getBook_InvalidBookId_Failure() throws Exception {
 		URI uri = new URI(baseUrl + port + "/books/1");
-		
+
 		ResponseEntity<Book> result = restTemplate.getForEntity(uri, Book.class);
-			
+
 		assertEquals(404, result.getStatusCode().value());
 	}
 
@@ -97,8 +98,8 @@ class BookIntegrationTest {
 		users.save(new User("admin", encoder.encode("goodpassword"), "ROLE_ADMIN"));
 
 		ResponseEntity<Book> result = restTemplate.withBasicAuth("admin", "goodpassword")
-										.postForEntity(uri, book, Book.class);
-			
+				.postForEntity(uri, book, Book.class);
+
 		assertEquals(201, result.getStatusCode().value());
 		assertEquals(book.getTitle(), result.getBody().getTitle());
 	}
@@ -106,89 +107,96 @@ class BookIntegrationTest {
 	/**
 	 * TODO: Activity 2 (Week 6)
 	 * Add integration tests for delete/update a book.
-	 * For delete operation: there should be two tests for success and failure (book not found) scenarios.
+	 * For delete operation: there should be two tests for success and failure (book
+	 * not found) scenarios.
 	 * Similarly, there should be two tests for update operation.
 	 * You should assert both the HTTP response code, and the value returned if any
 	 * 
-	 * For delete and update, you should use restTemplate.exchange method to send the request
-	 * E.g.: ResponseEntity<Void> result = restTemplate.withBasicAuth("admin", "goodpassword")
-										.exchange(uri, HttpMethod.DELETE, null, Void.class);
+	 * For delete and update, you should use restTemplate.exchange method to send
+	 * the request
+	 * E.g.: ResponseEntity<Void> result = restTemplate.withBasicAuth("admin",
+	 * "goodpassword")
+	 * .exchange(uri, HttpMethod.DELETE, null, Void.class);
 	 */
 	// your code here
-	public void deleteBook_ValidBookId_Success() throws Exception{
+	public void deleteBook_ValidBookId_Success() throws Exception {
 		Book book = new Book("A New Hope");
-		URI uri = new URI(baseUrl + port + "/books/" +book.getId());
+		URI uri = new URI(baseUrl + port + "/books/" + book.getId());
 		books.save(book);
 
 		users.save(new User("admin", encoder.encode("goodpassword"), "ROLE_ADMIN"));
 
 		ResponseEntity<Void> result = restTemplate.withBasicAuth("admin", "goodpassword")
-										.exchange(uri, HttpMethod.DELETE, null, Void.class);
+				.exchange(uri, HttpMethod.DELETE, null, Void.class);
 
-		assertEquals(200,result.getStatusCode().value());
+		assertEquals(200, result.getStatusCode().value());
 
 		result = restTemplate.withBasicAuth("admin", "goodpassword").exchange(uri, HttpMethod.DELETE, null, Void.class);
 
-		assertEquals(404,result.getStatusCode().value());
+		assertEquals(404, result.getStatusCode().value());
 	}
-	public void deleteBook_inValidBookId_Failure() throws Exception{
+
+	public void deleteBook_inValidBookId_Failure() throws Exception {
 		Book book = new Book("A New Hope");
-		URI uri = new URI(baseUrl + port + "/books/" +book.getId());
+		URI uri = new URI(baseUrl + port + "/books/" + book.getId());
 
 		users.save(new User("admin", encoder.encode("goodpassword"), "ROLE_ADMIN"));
 
 		ResponseEntity<Void> result = restTemplate.withBasicAuth("admin", "goodpassword")
-										.exchange(uri, HttpMethod.DELETE, null, Void.class);
+				.exchange(uri, HttpMethod.DELETE, null, Void.class);
 
-		assertEquals(404,result.getStatusCode().value());
+		assertEquals(404, result.getStatusCode().value());
 	}
 
-	public void updateBook_ValidBookId_Success() throws Exception{
-		
-		//arrange book
+	public void updateBook_ValidBookId_Success() throws Exception {
+
+		// arrange book
 		Book book = new Book("A New Hope");
-		//arrange updated book
+		// arrange updated book
 		Book newBook = new Book("A Updated Hope");
 
-		//arrange uri
-		URI uri = new URI(baseUrl + port + "/books/" +book.getId());
-		
-		//mock the save
+		// arrange uri
+		URI uri = new URI(baseUrl + port + "/books/" + book.getId());
+
+		// mock the save
 		books.save(book);
-		
+
 		// arrange and mock save
 		users.save(new User("admin", encoder.encode("goodpassword"), "ROLE_ADMIN"));
-		
+
 		RequestEntity<Book> request = RequestEntity
-		.post(uri)
-		.accept(MediaType.APPLICATION_JSON)
-		.body(newBook);
+				.post(uri)
+				.accept(MediaType.APPLICATION_JSON)
+				.body(newBook);
 
 		ResponseEntity<Book> result = restTemplate.withBasicAuth("admin", "goodpassword")
-										.exchange(request, Book.class);
+				.exchange(request, Book.class);
 
-		assertEquals(200,result.getStatusCode().value());
-		assertEquals(newBook.getTitle(),result.getBody().getTitle());
+		assertEquals(200, result.getStatusCode().value());
+		assertEquals(newBook.getTitle(), result.getBody().getTitle());
 	}
-	public void updateBook_inValidBookId_Failure() throws Exception{
-		
-		//arrange book
+
+	public void updateBook_inValidBookId_Failure() throws Exception {
+
+		// arrange book
 		Book book = new Book("A New Hope");
 
-		//arrange uri
-		URI uri = new URI(baseUrl + port + "/books/" +book.getId());
-				
+		System.out.println("hellooo");
+
+		// arrange uri
+		URI uri = new URI(baseUrl + port + "/books/" + book.getId());
+
 		// arrange and mock save
 		users.save(new User("admin", encoder.encode("goodpassword"), "ROLE_ADMIN"));
-		
+
 		RequestEntity<Book> request = RequestEntity
-		.post(uri)
-		.accept(MediaType.APPLICATION_JSON)
-		.body(book);
+				.post(uri)
+				.accept(MediaType.APPLICATION_JSON)
+				.body(book);
 
 		ResponseEntity<Book> result = restTemplate.withBasicAuth("admin", "goodpassword")
-										.exchange(request, Book.class);
+				.exchange(request, Book.class);
 
-		assertEquals(404,result.getStatusCode().value());
+		assertEquals(404, result.getStatusCode().value());
 	}
 }
