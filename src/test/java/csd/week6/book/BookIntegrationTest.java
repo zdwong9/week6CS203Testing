@@ -182,6 +182,9 @@ class BookIntegrationTest {
 		Book book = new Book("A New Hope");
 
 		System.out.println("hellooo");
+		System.out.println("hellooo");
+		System.out.println("hellooo");
+		System.out.println("hellooo");
 
 		// arrange uri
 		URI uri = new URI(baseUrl + port + "/books/" + book.getId());
